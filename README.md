@@ -8,7 +8,7 @@ An interactive analytics dashboard that combines publicly available economic ind
 ![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-purple)
 ![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red)
 
-> **Dashboard Screenshot**
+> ## Dashboard Preview 
 >
 > ![Texas Food Insecurity Dashboard](assests/dashboard.pgn)
 
