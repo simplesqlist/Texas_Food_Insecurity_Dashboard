@@ -10,7 +10,7 @@ An interactive analytics dashboard that combines publicly available economic ind
 
 > **Dashboard Screenshot**
 >
-> *(assests/dashboard.pgn)*
+> ![Texas Food Insecurity Dashboard](assests/dashboard.pgn)
 
 ---
 
