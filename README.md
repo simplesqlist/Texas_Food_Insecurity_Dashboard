@@ -42,10 +42,10 @@ The dashboard allows users to compare counties, explore county-level economic in
 
 ### Project Resources
 
-- Database Schema and ERD ![Database ERD](assets/ERD.png)
+- Database Schema and ERD 
 - SQL Data Cleaning and Preparation Scripts *(Coming soon)*
 - SQL Analytics Queries
-- Interactive Streamlit Dashboard *(Coming soon)*
+- Interactive Streamlit Dashboard 
 
 ---
 
