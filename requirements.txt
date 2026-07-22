@@ -3,3 +3,4 @@ pandas
 mysql-connector-python 
 google-generativeai 
 python-dotenv
+google-genai
