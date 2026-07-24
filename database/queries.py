@@ -1,46 +1,29 @@
-import pandas as pd 
-from database.connection import get_connection 
 
-def get_county_metrics(): 
-    conn = get_connection() 
+from pathlib import Path
 
-    query = """
-    SELECT 
-        c.county_name, 
-        cs.food_risk_score, 
-        cs.risk_level, 
-        cs.poverty_rate,
-        cs.normalized_poverty,
-        cs.normalized_snap, 
-        cs.normalized_unemployment,
-        cs.normalized_income_risk,
-        cm.snap_rate, 
-        cm.unemployment_rate,
-        cm.household_median_income 
-    FROM counties c 
-    JOIN county_scores cs 
-        ON c.county_id = cs.county_id 
-    JOIN county_metrics cm 
-        ON c.county_id = cm.county_id 
-    ORDER BY cs.food_risk_score DESC;
-    """
+import pandas as pd
 
-    df = pd.read_sql(query, conn)
-    conn.close() 
-    return df 
+
+def get_county_metrics() -> pd.DataFrame:
+    project_root = Path(__file__).resolve().parent.parent
+    csv_path = project_root / "data" / "dashboard_data.csv"
+
+    return pd.read_csv(csv_path)
+
 
 def get_dashboard_kpis(): 
-    conn = get_connection() 
-    query = """ 
-    SELECT 
-        COUNT(*) AS total_counties, 
-        ROUND(AVG(food_risk_score), 2) AS average_food_risk, 
-        MAX(food_risk_score) AS highest_score, 
-        MIN(food_risk_score) AS lowest_score 
-    FROM county_scores; 
-    """ 
+    metrics = get_county_metrics()
 
-    df = pd.read_sql(query, conn) 
-    conn.close()
-    return df 
+    return pd.DataFrame({
+        "total_counties": [len(metrics)],
+        "average_food_risk": [
+            round(metrics["food_risk_score"].mean(), 2)
+        ],
+        "highest_score": [
+            round(metrics["food_risk_score"].max(), 2)
+        ],
+        "lowest_score": [
+            round(metrics["food_risk_score"].min(), 2)
+        ]
+    })
 

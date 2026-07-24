@@ -1,6 +1,7 @@
 import streamlit as st 
 from database.queries import get_county_metrics
 
+
 st.set_page_config( 
     page_title="Texas Food Insecurity Dashboard",
     page_icon="📊",
@@ -15,7 +16,7 @@ st.write("Analyze county-level food insecurity risk across Texas.")
 
 # Load Data 
 
-metrics = pd.read_csv("data/dashboard_data.csv")
+metrics = get_county_metrics()
 
 # Sidebar Filters 
 
