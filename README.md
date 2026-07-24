@@ -1,5 +1,7 @@
 # Texas Food Insecurity Dashboard
 
+**Live Dashboard:** [Open the Dashboard] (https://texasfoodinsecuritydashboard-uuedmh47zbrxvtcvowrl4t.streamlit.app)
+
 Built an interactive dashboard that aggregates public economic indicators into a unified Food Risk Score for all 254 Texas counties.
 
 ![SQL](https://img.shields.io/badge/SQL-MySQL-blue)
@@ -8,9 +10,6 @@ Built an interactive dashboard that aggregates public economic indicators into a
 ![Pandas](https://img.shields.io/badge/Pandas-Data%20Analysis-purple)
 ![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red)
 
-## Live Demo 
-
-**Try the interactive dashboard here:**
 
  ## Dashboard Preview 
 
