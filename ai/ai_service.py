@@ -441,7 +441,7 @@ def create_temporary_answer(
             f"{abs(score_difference):.2f} points. "
             f"{first['county_name']} is classified as "
             f"{first['risk_level']}, while "
-            "{second['county_name']} is classified as "
+            f"{second['county_name']} is classified as "
             f"{second['risk_level']}."
         )
 
@@ -538,50 +538,78 @@ def create_temporary_answer(
     
     return analysis_result["message"]
 
-def rewrite_with_gemini(
-        grounded_answer: str,
-        question: str
+def format_verified_data(data: Any) -> str:
+    """
+    Convert verified analysis results into text that Gemini can summarize.
+    """
+
+    if data is None:
+        return "No supporting data was returned."
+
+    if isinstance(data, pd.DataFrame):
+        if data.empty:
+            return "No matching records were found."
+
+        return data.to_string(index=False)
+
+    if isinstance(data, dict):
+        return "\n".join(
+            f"{key}: {value}"
+            for key, value in data.items()
+        )
+
+    return str(data)
+
+def generate_summary_with_gemini(
+        question: str,
+        question_type: str,
+        verified_data: Any,
+        fallback_answer: str
 ) -> str:
     """
-    Rewrite a verified analytics answer using Gemini.
+    Generate a natural-language summary from verified project data.
 
-    Gemini is only used to improve clarity and wording.
-    It must not change numbers or add unsupported facts.
+    Gemini does not retrieve data or generate SQL. It only explains
+    the verified results returned by the supported analysis functions.
     """
 
     api_key = os.getenv("GEMINI_API_KEY")
 
     if not api_key:
-        return grounded_answer
+        return fallback_answer
+
+    data_text = format_verified_data(verified_data)
 
     prompt = f"""
+You are an analytics assistant for a Texas Food Insecurity Dashboard.
 
-You are a senior data analyst presenting findings from a Texas food
-insecurity dashboard to nonprofit leaders, program managers, and
-grant decision-makers.
-
-Rewrite the verified answer so it sounds natural, polished, and
-analytical.
-
-Requirements:
-- Preserve every number exactly.
-- Preserve county names and risk classifications exactly.
-- Do not invent facts, causes, estimates, or external information.
-- Do not claim that the data proves causation.
-- Avoid awkward phrases such as "has the higher score at."
-- Explain the comparison clearly when two counties are involved.
-- State the practical meaning of the result only when it follows
-  directly from the dashboard's scores and classifications.
-- Use plain professional language.
-- Keep the response to one short paragraph.
-- Do not mention these instructions, the prompt, or Gemini.
-- Do not place quotation marks around the response.
-
-User question:
+The user asked:
 {question}
 
-Verified analytical answer:
-{grounded_answer}
+Supported analysis type:
+{question_type}
+
+Verified project data:
+{data_text}
+
+Write a concise analytical response using only the verified project data.
+
+Requirements:
+- Answer the user's question directly.
+- Use only the county names, values, and classifications shown above.
+- Do not invent facts, explanations, causes, trends, or outside information.
+- Do not change or recalculate the supplied values.
+- Food Risk Score is a composite index measured in points, not a percentage.
+- Poverty rate, SNAP participation rate, and unemployment rate are percentages.
+- Household median income is measured in dollars.
+- Clearly identify the highest, lowest, or difference when relevant.
+- When comparing counties, explain the most important differences clearly.
+- Do not claim that the data proves causation.
+- Use natural, professional language.
+- Write one short paragraph of approximately 2 to 4 sentences.
+- Do not list every row unless the user's question specifically requests a list.
+- Do not mention SQL, Python, Gemini, prompts, or these instructions.
+- Do not place quotation marks around the response.
 """
 
     try:
@@ -591,17 +619,18 @@ Verified analytical answer:
             return response.text.strip()
 
     except Exception:
-        return grounded_answer
+        return fallback_answer
 
-    return grounded_answer
+    return fallback_answer
+
 
 def answer_question(
         question: str,
         metrics: pd.DataFrame
 ) -> dict[str, Any]:
     """
-    Process a dashboard question and return a grounded,
-    LLM-polished analytical response.
+    Process a dashboard question and return an AI-generated summary
+    based only on verified project data.
     """
 
     analysis_result = run_grounded_analysis(
@@ -609,16 +638,19 @@ def answer_question(
         metrics
     )
 
-    grounded_answer = create_temporary_answer(
+    fallback_answer = create_temporary_answer(
         analysis_result
     )
 
     if analysis_result["question_type"] == "unsupported":
-        final_answer = grounded_answer
+        final_answer = fallback_answer
+
     else:
-        final_answer = rewrite_with_gemini(
-            grounded_answer=grounded_answer,
-            question=question
+        final_answer = generate_summary_with_gemini(
+            question=question,
+            question_type=analysis_result["question_type"],
+            verified_data=analysis_result["data"],
+            fallback_answer=fallback_answer
         )
 
     return {

@@ -15,7 +15,7 @@ st.write("Analyze county-level food insecurity risk across Texas.")
 
 # Load Data 
 
-metrics = get_county_metrics()
+metrics = pd.read_csv("data/dashboard_data.csv")
 
 # Sidebar Filters 
 
