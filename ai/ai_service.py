@@ -72,9 +72,11 @@ def identify_question_type(
     """
 
     cleaned_question = question.strip().lower()
+    cleaned_question = cleaned_question.replace("-", " ")
 
     if not cleaned_question: 
         raise ValueError("Enter a question before submitting.")
+
     
     counties = find_counties_in_question( 
         cleaned_question, 
@@ -144,7 +146,10 @@ def identify_question_type(
     if any( 
         phrase in cleaned_question 
         for phrase in [ 
-            "highest risk", 
+            "highest risk",
+            "highest food risk score",
+            "highest risk score", 
+            "food risk score", 
             "top counties",
             "prioritize",
             "funding first", 
