@@ -198,6 +198,60 @@ def  extract_requested_limit(
     
     return min(requested_limit, maximum)
 
+def determine_result_limit(
+        question: str,
+        default: int = 10,
+        maximum: int = 25
+) -> int:
+    """
+    Determine how many results the user requested.
+
+    Singular questions such as "Which county has the highest risk?"
+    return one result. Questions containing a number use that number.
+    Otherwise, the default number of results is returned.
+    """
+
+    cleaned_question = question.strip().lower()
+    cleaned_question = cleaned_question.replace("-", " ")
+
+    number_match = re.search(r"\b(\d+)\b", cleaned_question)
+
+    if number_match: 
+        requested_limit = int(number_match.group(1))
+
+        if requested_limit > 0: 
+            return min(requested_limit, maximum)
+
+    singular_phrases = [
+        "which county",
+        "what county",
+        "who has",
+        "which one",
+        "what is the highest",
+        "what's the highest", 
+        "which is the highest", 
+        "what is the lowest", 
+        "what's the lowest",
+        "which is the lowest",
+        "highest county",
+        "county has the highest",
+        "county with the highest",
+        "county has the lowest",
+        "county with the lowest",
+        "give me the county", 
+        "name the county", 
+    ]
+
+    if any(phrase in cleaned_question for phrase in singular_phrases):
+        return 1
+    
+
+    return extract_requested_limit(
+        question,
+        default=default,
+        maximum=maximum
+    )
+
 def run_grounded_analysis( 
         question: str, 
         metrics: pd.DataFrame 
@@ -215,7 +269,7 @@ def run_grounded_analysis(
     )
 
     if question_type == "highest_poverty":
-        limit = extract_requested_limit(question)
+        limit = determine_result_limit(question)
 
         result = get_highest_poverty_counties(
             metrics,
@@ -232,7 +286,7 @@ def run_grounded_analysis(
         }
 
     if question_type == "highest_snap":
-        limit = extract_requested_limit(question)
+        limit = determine_result_limit(question)
 
         result = get_highest_snap_counties(
             metrics,
@@ -249,7 +303,7 @@ def run_grounded_analysis(
         }
 
     if question_type == "highest_unemployment":
-        limit = extract_requested_limit(question)
+        limit = determine_result_limit(question)
 
         result = get_highest_unemployment_counties(
             metrics,
@@ -266,7 +320,7 @@ def run_grounded_analysis(
         }
 
     if question_type == "lowest_income":
-        limit = extract_requested_limit(question)
+        limit = determine_result_limit(question)
 
         result = get_lowest_income_counties(
             metrics,
@@ -283,7 +337,7 @@ def run_grounded_analysis(
         }
 
     if question_type == "highest_risk": 
-        limit = extract_requested_limit(question) 
+        limit = determine_result_limit(question) 
 
         result = get_highest_risk_counties( 
             metrics, 
@@ -444,7 +498,6 @@ def create_temporary_answer(
             f"{second['county_name']} is classified as "
             f"{second['risk_level']}."
         )
-
     
     if question_type == "high_poverty_low_snap":
         if data.empty: 
