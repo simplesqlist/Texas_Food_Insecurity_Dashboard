@@ -27,6 +27,7 @@ from analytics.county_analysis import(
     get_highest_unemployment_counties,  
     get_largest_risk_driver,
     get_lowest_income_counties,
+    get_statewide_summary, 
 )
 
 def find_counties_in_question( 
@@ -97,6 +98,28 @@ def identify_question_type(
         )
     ): 
         return "high_poverty_low_snap", counties 
+    
+    if any(
+        phrase in cleaned_question
+        for phrase in [
+            "average food risk",
+            "average risk score",
+            "statewide average",
+            "statewide summary",
+            "dashboard summary",
+            "overall summary",
+            "summary statistics",
+            "how many counties",
+            "number of counties",
+            "counties are classified",
+            "counties classified",
+            "risk level counts",
+            "highest and lowest risk",
+            "highest and lowest food risk",
+        ]
+    ):
+        return "statewide_summary", counties
+
     
     if any(
         phrase in cleaned_question
@@ -273,6 +296,15 @@ def run_grounded_analysis(
         metrics 
     )
 
+    if question_type == "statewide_summary":
+        result = get_statewide_summary(metrics)
+
+        return {
+            "question_type": question_type,
+            "data": result,
+            "message": "Statewide dashboard summary.",
+        }
+
     if question_type == "highest_poverty":
         limit = determine_result_limit(question)
 
@@ -425,7 +457,7 @@ def run_grounded_analysis(
         "data": None, 
         "message": ( 
             "I could not match that question to a supported analysis. "
-            "Try asking about a county profile, two-county comparison, "
+            "Try asking about a statewide summary, average Food Risk Score, "
             "highest Food Risk Scores, highest poverty, highest SNAP "
             "participation, highest unemployment, lowest household "
             "income, largest risk driver, or counties with high poverty "
@@ -448,6 +480,25 @@ def create_temporary_answer(
 
     if question_type == "unsupported": 
         return analysis_result["message"]
+    
+    if question_type == "statewide_summary":
+        risk_counts = data["risk_level_counts"]
+
+        risk_count_text = ", ".join(
+            f"{risk_level}: {count}"
+            for risk_level, count in risk_counts.items()
+        )
+
+        return (
+            f"The dataset includes {data['total_counties']} Texas counties. "
+            f"The average Food Risk Score is "
+            f"{data['average_food_risk_score']:.2f} points. "
+            f"{data['highest_risk_county']} has the highest score at "
+            f"{data['highest_food_risk_score']:.2f} points, while "
+            f"{data['lowest_risk_county']} has the lowest score at "
+            f"{data['lowest_food_risk_score']:.2f} points. "
+            f"Risk-level counts are: {risk_count_text}."
+        )
     
     if question_type == "highest_risk": 
         county_list = data[ 

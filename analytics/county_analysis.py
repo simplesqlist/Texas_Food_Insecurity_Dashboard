@@ -474,3 +474,66 @@ def get_lowest_income_counties(
         .head(limit)
         .reset_index(drop=True)
     )
+
+def get_statewide_summary(
+        metrics: pd.DataFrame
+) -> dict:
+    """
+    Return statewide summary statistics for the dashboard.
+
+    Parameters:
+        metrics: County-level dashboard DataFrame.
+
+    Returns:
+        A dictionary containing statewide Food Risk Score statistics
+        and county counts by risk level.
+    """
+
+    required_columns = {
+        "county_name",
+        "food_risk_score",
+        "risk_level"
+    }
+
+    missing_columns = required_columns - set(metrics.columns)
+
+    if missing_columns:
+        raise ValueError(
+            f"Missing required columns: {sorted(missing_columns)}"
+        )
+
+    if metrics.empty:
+        raise ValueError("The county metrics dataset is empty.")
+
+    highest_county = metrics.loc[
+        metrics["food_risk_score"].idxmax()
+    ]
+
+    lowest_county = metrics.loc[
+        metrics["food_risk_score"].idxmin()
+    ]
+
+    risk_counts = (
+        metrics["risk_level"]
+        .value_counts()
+        .to_dict()
+    )
+
+    return {
+        "total_counties": int(len(metrics)),
+        "average_food_risk_score": round(
+            float(metrics["food_risk_score"].mean()),
+            2
+        ),
+        "highest_risk_county": highest_county["county_name"],
+        "highest_food_risk_score": round(
+            float(highest_county["food_risk_score"]),
+            2
+        ),
+        "lowest_risk_county": lowest_county["county_name"],
+        "lowest_food_risk_score": round(
+            float(lowest_county["food_risk_score"]),
+            2
+        ),
+        "risk_level_counts": risk_counts
+    }
