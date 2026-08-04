@@ -1,6 +1,6 @@
 # Texas Food Insecurity Dashboard
 
-**Live Dashboard:** [Open the Dashboard] (https://texasfoodinsecuritydashboard-uuedmh47zbrxvtcvowrl4t.streamlit.app)
+**Live Dashboard:** [Open the Dashboard](https://texasfoodinsecuritydashboard-uuedmh47zbrxvtcvowrl4t.streamlit.app)
 
 Built an interactive dashboard that aggregates public economic indicators into a unified Food Risk Score for all 254 Texas counties.
 
@@ -30,19 +30,19 @@ Food insecurity is influenced by multiple economic factors, including poverty, h
 
 This project addresses that challenge by combining these indicators into a single Food Risk Score for every county in Texas. Publicly available county-level data from Data Commons is imported into a MySQL database, analyzed using SQL and Python, and presented through an interactive Streamlit dashboard.
 
-The dashboard allows users to compare counties, explore county-level economic indicators, visualize Food Risk Scores, and ask supported natural-language questions through a SQL powered AI Analytics Assistant that retrieves verified project data.
+The dashboard allows users to compare counties, explore county-level economic indicators, visualize Food Risk Scores, and ask supported natural-language questions through a SQL-powered AI Analytics Assistant that retrieves verified project data.
 
 ### This project explores the following areas
 
 - Food Risk Score methodology
 - County-level economic indicators
 - County risk comparisons
-- SQL- powered AI Analytics Assistant
+- SQL-powered AI Analytics Assistant
 
 ### Project Resources
 
 - Database Schema and ERD 
-- SQL Data Cleaning and Preparation Scripts *(Coming soon)*
+- SQL Data Cleaning and Preparation Scripts
 - SQL Analytics Queries
 - Interactive Streamlit Dashboard 
 
@@ -53,15 +53,30 @@ The dashboard allows users to compare counties, explore county-level economic in
 
 This analysis combines four county-level economic indicators into a composite Food Risk Score to identify and compare food insecurity risk across all 254 Texas counties. 
 
-Key findings from the analysis include:
+### Finding 1: Priority Counties
 
-- **Finding 1** *(Replace with final insight and statistics.)*
+**Question**
 
-- **Finding 2** *(Replace with final insight and statistics.)*
+Which counties should nonprofits prioritize for food assistance?
 
-- **Finding 3** *(Replace with final insight and statistics.)*
+*To pinpoint the areas facing the highest risk of food insecurity, we created a single Food Risk Score combining poverty rates, household income, unemployment, and SNAP participation. Dimmit (91.43), Starr (87.55), Zapata (87.03), Zavala (82.16), and Presidio (75.69) counties emerged with the highest scores. These counties represent the highest-priority candidates for further assessment and resource allocation.*
 
-The Streamlit dashboard allows users to explore these findings through interactive visualizations, county comparisons, and a SQL-powered AI Analytics Assistant that retrieves verified project data for supported natural-language questions.
+### Finding 2: Potential Gaps in SNAP Participation 
+
+**Question** 
+
+Which counties may require additional review because poverty is high but SNAP participation is relatively low? 
+
+*The analysis identified 10 counties that met the criteria for high poverty rates alongside low SNAP engagement: Throckmorton, Brazos, Coke, Baylor, Oldham, Coleman, Castro, Morris, Motley, and Dickens. This pattern doesn't explicitly prove a flaw in SNAP access, but it highlights a potential gap where elevated poverty isn't matching program enrollment. These locations warrant further local analysis to uncover potential barriers and optimize outreach strategies.*
+
+### Finding 3: Statewide Risk Distribution
+
+**Question** 
+
+How is food insecurity risk distributed across Texas?
+
+*The data reveals that food insecurity risk impacts all 254 Texas counties, suggesting it is a statewide issue rather than a hyper-localized one. By classifying the state into risk tiers, we identified 63 Severe Risk, 63 High Risk, 64 Moderate Risk, and 64 Low Risk counties, with a baseline average score of 41.00. This distribution supports a tiered approach to prioritizing nonprofit resources, allowing organizations to distinguish between counties requiring immediate intervention and those appropriate for longer-term planning.*
+
 
 ## Dashboard Features:
 
@@ -73,6 +88,11 @@ The Streamlit dashboard allows users to explore these findings through interacti
 
 ## AI Analytics Assistant 
 
+The dashboard features a SQL-powered AI Analytics Assistant that answers natural-language questions using verified project data. The assistant matches user queries to predefined analytical functions and uses Google Gemini to summarize the results while preserving the integrity of the underlying data.
+
+### AI Assistant Preview 
+
+![AI Analytics Assistant](assets/ai_assistant.png)
 
 ### Analytics Workflow
 
